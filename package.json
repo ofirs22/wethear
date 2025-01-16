@@ -1,0 +1,21 @@
+{
+  "name": "weather",
+  "version": "1.0.0",
+  "main": "index.js",
+"scripts": {
+  "start": "concurrently \"npm run dev-frontend\" \"npm run start-backend\"",
+  "dev": "concurrently \"npm run dev-frontend\" \"npm run dev-backend\"",
+  "dev-frontend": "npm run dev --prefix client/weather-front",
+  "dev-backend": "npm run dev --prefix server",
+  "start-backend": "npm run start --prefix server"
+}
+,
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "nodemon": "^3.1.9"
+  }
+}
