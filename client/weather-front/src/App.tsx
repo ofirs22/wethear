@@ -12,12 +12,10 @@ export interface History {
   maxTemp: number;
 }
 
-
-
 const App: React.FC = () => {
-  //if start date is in localStorage initialize start date with the data, otherwise use the default of 30 days ago
-  const [startDate, setStartDate] = useState<Dayjs>(localStorage.getItem('start_date') ? dayjs(localStorage.getItem("start_date")) : dayjs().subtract(30, "day") );
-  //if end date is in localStorage initialize end date with the data, otherwise use today
+  // If start date is in localStorage initialize start date with the data, otherwise use the default of 30 days ago
+  const [startDate, setStartDate] = useState<Dayjs>(localStorage.getItem('start_date') ? dayjs(localStorage.getItem("start_date")) : dayjs().subtract(30, "day"));
+  // If end date is in localStorage initialize end date with the data, otherwise use today
   const [endDate, setEndDate] = useState<Dayjs>(localStorage.getItem('end_date') ? dayjs(localStorage.getItem("end_date")) : dayjs());
   const [historyData, setHistoryData] = useState<History[]>([]);
   const [loading, setLoading] = useState(false);
@@ -25,7 +23,6 @@ const App: React.FC = () => {
 
   // Validation function to ensure dates are valid
   const validateDateRange = (): boolean => {
-    console.log(dayjs())
     const yesterday = dayjs().subtract(1, "day");
 
     // Check if any date is today or in the future
@@ -47,27 +44,26 @@ const App: React.FC = () => {
 
   // Function to fetch history data
   const fetchHistory = async () => {
-    
     if (!validateDateRange()) {
       return; // Do not proceed if validation fails
     }
-    //after dates passed validation, set localStorage with with dates values
-    localStorage.setItem("start_date", startDate.format("YYYY-MM-DD"));
-    localStorage.setItem("end_date", endDate.format("YYYY-MM-DD"));
+
     setLoading(true); // Show loader
     try {
-      //Prepare the body
+      // Prepare the body
       const payload = {
         start_date: startDate.format("YYYY-MM-DD"),
         end_date: endDate.format("YYYY-MM-DD"),
       };
-      //Make API call to backend
+
+      // Make API call to backend
       const response = await fetch("http://localhost:3000", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      //check if response is fine
+
+      // Check if response is fine
       if (!response.ok) {
         throw new Error(`Error: ${response.statusText}`);
       }
@@ -81,19 +77,40 @@ const App: React.FC = () => {
     }
   };
 
-    // Load dates from localStorage on app initialization
-    useEffect(() => {
-      const savedStartDate = localStorage.getItem("start_date");
-      const savedEndDate = localStorage.getItem("end_date");
-      //If values exist in localStorage save them in state
-      if (savedStartDate) {
-        setStartDate(dayjs(savedStartDate));
-      }
-  
-      if (savedEndDate) {
-        setEndDate(dayjs(savedEndDate));
-      }
-    }, []);
+  // Load dates from localStorage on app initialization
+  useEffect(() => {
+    const savedStartDate = localStorage.getItem("start_date");
+    const savedEndDate = localStorage.getItem("end_date");
+
+    // If values exist in localStorage, save them in state
+    if (savedStartDate) {
+      setStartDate(dayjs(savedStartDate));
+    }
+
+    if (savedEndDate) {
+      setEndDate(dayjs(savedEndDate));
+    }
+  }, []);
+
+  // Update and save the start date in localStorage when it changes
+  const handleStartDateChange = (newStartDate: Dayjs) => {
+    if (newStartDate.isAfter(endDate)) {
+      setErrorMessage("Start date cannot be after the end date.");
+      return;
+    }
+    setStartDate(newStartDate);
+    localStorage.setItem("start_date", newStartDate.format("YYYY-MM-DD"));
+  };
+
+  // Update and save the end date in localStorage when it changes
+  const handleEndDateChange = (newEndDate: Dayjs) => {
+    if (newEndDate.isBefore(startDate)) {
+      setErrorMessage("End date cannot be before the start date.");
+      return;
+    }
+    setEndDate(newEndDate);
+    localStorage.setItem("end_date", newEndDate.format("YYYY-MM-DD"));
+  };
 
   return (
     <div style={{ padding: "20px" }}>
@@ -103,8 +120,8 @@ const App: React.FC = () => {
       <DateRangeSelector
         startDate={startDate}
         endDate={endDate}
-        onStartDateChange={setStartDate}
-        onEndDateChange={setEndDate}
+        onStartDateChange={handleStartDateChange} // Save to localStorage when start date changes
+        onEndDateChange={handleEndDateChange}     // Save to localStorage when end date changes
       />
 
       {/* Error Message */}
