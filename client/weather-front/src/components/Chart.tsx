@@ -101,6 +101,7 @@ const ChartComponent: React.FC<ChartProps> = ({ historyData }) => {
         title: {
           display: true,
           text: "Temperature (°C)",
+          align: "end"
         },
       },
     },

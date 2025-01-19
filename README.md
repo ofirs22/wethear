@@ -106,18 +106,23 @@ POST / - Accepts a start_date and end_date and returns an array of historical we
   - `express`: ^4.18.0 - Web framework for Node.js
   - `cors`: ^2.8.5 - Cross-Origin Resource Sharing middleware
   - `dotenv`: ^16.0.0 - Environment variables management
- 
+
 - **Security**:
   - `helmet`: ^7.1.0 - Secure Express apps by setting various HTTP headers
-  - Protects against:
-    - Cross-Site-Scripting (XSS)
     - Content Security Policy
+    - Cross-Origin protection
     - DNS Prefetch Control
-    - Frameguard to prevent clickjacking
-    - Hide Powered-By
-    - HSTS for secure connections
-    - And more security headers
+    - Frameguard protection
+    - HSTS
+    - XSS Filter
+  - `express-rate-limit`: ^7.5.0 - Basic rate-limiting middleware
+    - Protects against brute force attacks
+    - Limits repeated requests to endpoints
 
+- **Data Validation**:
+  - `date-fns`: ^4.1.0 - Modern JavaScript date utility library
+    - Date validation
+    - Date parsing and formatting
 
 - **TypeScript Support**:
   - `typescript`: ^5.0.0 - JavaScript with syntax for types
@@ -134,7 +139,6 @@ POST / - Accepts a start_date and end_date and returns an array of historical we
 - **API & Data Handling**:
   - `axios`: ^1.6.0 - Promise based HTTP client
   - `body-parser`: ^1.20.0 - Request parsing middleware
-  - `date-fns`: ^3.0.0 - Date utility library
 
 ## CORS Configuration
 The backend has CORS configured to allow communication from the frontend. If needed, modify the CORS settings in the backend to match your environment.
@@ -148,3 +152,17 @@ The client and server are run concurrently using the concurrently package.
 ## License
 
 This project is licensed under the MIT License.
+
+## Security Features
+The backend implements several security measures:
+
+- **Request Rate Limiting**: Limits each IP to 100 requests per 15 minutes
+- **Request Size Limits**: JSON and URL-encoded payloads limited to 10KB
+- **Input Validation**: Date parameters are validated before processing
+- **Production Error Handling**: Sanitized error responses in production
+- **Security Headers**: Comprehensive set of security headers via Helmet
+  - XSS Protection
+  - Content Security Policy
+  - Frame protection
+  - HSTS
+  - And more...
